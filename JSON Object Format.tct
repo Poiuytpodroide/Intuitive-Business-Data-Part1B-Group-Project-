@@ -1,0 +1,24 @@
+This is the file to define what the structure of the JSON version of the VPL program should look like
+
+{
+    "Policy Name" : "Example",
+    "Data Sources" : [ \\ List of all the data sources that the policy will act of],
+    "Nodes" : [ \\ List of all the nodes in the program
+        {
+            "Node Type" : \\ Type of the node (eg ADD),
+            "Node Position" : \\ Rendered position of the node in the VLP [x, y]
+            \\ More options are possible depending on the node type
+        }
+    ],
+    "Connections" : [ \\ List of all the connections between nodes in the program pairs from input node to output. The order matters as in the case that the inputs of the block are not commutative then the inputs are in the same order as this list
+        [0, 1]
+    ]
+}
+
+Design Decisions:
+ - Node positions are stored as this allows programs to be reloaded to the front end without having to decide where they will be placed on the page.
+ - Data Sources are predefined so that the relivenet data sources can be requested as early as possible to improve execution time.
+
+
+List of all possible node types and descriptions:
+ - ADD : output is the + operator applied to all inputs.
