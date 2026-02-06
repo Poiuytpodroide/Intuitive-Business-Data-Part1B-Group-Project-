@@ -23,6 +23,10 @@ dist-ssr
 *.sln
 *.sw?
 
-#backend
+# backend
 .venv/
 backend/__pycache__/
+
+# database
+backend/data/CloudExpenses.db
+backend/data/CloudExpenses.db-journal
