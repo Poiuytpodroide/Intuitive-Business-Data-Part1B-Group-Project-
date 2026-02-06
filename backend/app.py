@@ -3,8 +3,6 @@ import database
 
 app = Flask(__name__)
 
-
-
 @app.route("/")
 def index():
     return "Flask API"
