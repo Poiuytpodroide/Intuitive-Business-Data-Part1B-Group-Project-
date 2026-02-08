@@ -3,7 +3,6 @@ import React from "react";
 
 
 const AIdashboard = () => {
-
     return ( 
         <div className="AIdashboard">
             <h1>AI Dashboard</h1>
