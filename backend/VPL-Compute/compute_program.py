@@ -94,7 +94,7 @@ if __name__ == '__main__':
 
     dir_path = os.path.dirname(os.path.realpath(__file__))
     
-    with open(dir_path + '/programs/example.json', 'r') as example_file:
+    with open(dir_path + '/data/programs/example.json', 'r') as example_file:
         example_program = json.load(example_file)
 
     compute_program(example_program)
