@@ -39,9 +39,30 @@ function PolicyCreator() {
     const params = new URLSearchParams(location.search);
     const policyId = params.get("policy");
     const isNew = params.get("new");
+    const instanceName = params.get("instanceName");
+
     if (isNew) {
-      setSelectedTemplate(templates[0]);
-      setSelectedBlock(null);
+      // If navigating here to create a NEW policy and an instanceName is provided,
+      // pre-select a reasonable template and auto-open the output block with the
+      // ticket pre-filled with the instance information.
+      const t = templates[0];
+      setSelectedTemplate(t);
+
+      if (instanceName) {
+        const outBlock = t.vplBlocks.find((b) => b.type === "output") || t.vplBlocks[0];
+        const prefilled = {
+          ...outBlock,
+          ticket: {
+            ...outBlock.ticket,
+            action: `Apply to ${decodeURIComponent(instanceName)}`,
+            description: `${decodeURIComponent(instanceName)} - apply this policy`,
+          },
+        };
+        setSelectedBlock(prefilled);
+      } else {
+        setSelectedBlock(null);
+      }
+
       return;
     }
 

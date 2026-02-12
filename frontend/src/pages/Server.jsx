@@ -41,6 +41,13 @@ export default function Server() {
     const costSeries = useMemo(() => genMockSeries(20, 30).map((v) => Math.round(v * 1.6)), []);
     const anomalies = useMemo(() => genMockSeries(10, 30).map((v) => (v > 85 ? 1 : 0)), []);
 
+    // Instances list for the Instances table (click to create a policy for that instance)
+    const instances = [
+        { id: "instance-1", name: "instance-1", usage: "45%", cost: "$120/day" },
+        { id: "instance-2", name: "instance-2", usage: "61%", cost: "$80/day" },
+        { id: "instance-3", name: "instance-3", usage: "12%", cost: "$15/day" },
+    ];
+
     return (
         <div className="server-page">
             <div className="server-grid">
@@ -95,21 +102,17 @@ export default function Server() {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>instance-1</td>
-                                    <td>45%</td>
-                                    <td>$120/day</td>
-                                </tr>
-                                <tr>
-                                    <td>instance-2</td>
-                                    <td>61%</td>
-                                    <td>$80/day</td>
-                                </tr>
-                                <tr>
-                                    <td>instance-3</td>
-                                    <td>12%</td>
-                                    <td>$15/day</td>
-                                </tr>
+                                {instances.map((ins) => (
+                                    <tr
+                                        key={ins.id}
+                                        className="clickable-row"
+                                        onClick={() => navigate(`/policy-editor?new=true&instanceId=${ins.id}&instanceName=${encodeURIComponent(ins.name)}`)}
+                                    >
+                                        <td>{ins.name}</td>
+                                        <td>{ins.usage}</td>
+                                        <td>{ins.cost}</td>
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                     </div>
