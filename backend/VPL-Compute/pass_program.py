@@ -34,9 +34,9 @@ def convert_program(json_program):
 
             output_program["nodes"][index_mapping[node["Index"]]] = assign_node(node["Type"], node)
             output_program["inputs"][index_mapping[node["Index"]]] = [index_mapping[i] for i in program_graph.in_set[node["Index"]]]
-        except:
+        except Exception as e:
             pass
-
+        
     return output_program
 
 

@@ -27,6 +27,7 @@ dist-ssr
 .venv/
 backend/__pycache__/
 backend/VPL-Compute/__pycache__/
+backend/VPL-Compute/fuzzer.py
 
 # database
 backend/data/CloudExpenses.db

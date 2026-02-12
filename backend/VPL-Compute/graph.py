@@ -60,6 +60,24 @@ class Graph:
 
         return sorted_order
 
+    def DAG_sort_remove(self, start_nodes):
+        connections = []
+        sorted_order = []
+        nodes = start_nodes.copy()
+        while len(nodes) > 0:
+            node = nodes.pop()
+            sorted_order.append(node)
+            try:
+                for output_node in self.out_set[node].copy():
+                    self.remove_edge(node, output_node)
+                    connections.append([node, output_node])
+                    if len(self.in_set[output_node]) == 0:
+                        nodes.append(output_node)
+            except:
+                pass
+            
+        return connections
+
 
 
 
