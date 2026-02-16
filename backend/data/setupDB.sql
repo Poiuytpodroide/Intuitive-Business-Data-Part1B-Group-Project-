@@ -1,3 +1,4 @@
+-- Set Nulls to actually be NULL
 UPDATE focus_raw
 SET
 AvailabilityZone = NULLIF(AvailabilityZone, 'NULL'),
@@ -46,7 +47,7 @@ SubAccountName = NULLIF(SubAccountName, 'NULL'),
 Tags = NULLIF(Tags, 'NULL');
 
 
-
+-- Extract revelant details from tags
 CREATE VIEW focus_with_tags AS
 SELECT *,
     json_extract(Tags,"$.business_unit") AS business_unit,
@@ -75,6 +76,34 @@ SELECT DISTINCT
     SubAccountName AS sub_account_name
 FROM focus_raw WHERE SubAccountId IS NOT NULL;
 
+-- create const_entity table
+DROP TABLE cost_entity;
+CREATE TABLE cost_entity (
+    provider_name TEXT,
+    billing_account_id TEXT,
+    sub_account_id TEXT,
+    service_category TEXT,
+    service_name TEXT,
+    region_id TEXT,
+    resource_id TEXT,
+    application TEXT,
+    business_unit TEXT
+);
+
+INSERT OR IGNORE INTO cost_entity
+SELECT DISTINCT
+    provider_name,
+    billing_account_id,
+    sub_account_id,
+    service_category,
+    service_name,
+    region_id,
+    resource_id,
+    application,
+    business_unit
+FROM focus_usage_cost;
+
+-- do i need to change sub_account_id to sub_account_name
 DROP TABLE focus_usage_cost;
 CREATE TABLE focus_usage_cost (
     provider_name TEXT NOT NULL,
@@ -143,7 +172,21 @@ FROM focus_usage_cost
 GROUP BY
     provider_name, billing_account_id, sub_account_id,
     service_category, service_name, region_id, resource_id,
-    application, business_unit, usage_hour, usage_unit;
+    application, business_unit, usage_hour, usage_unit
+ORDER BY usage_hour;
+
+-- Common aggregation by provider + hour
+CREATE INDEX idx_provider_hour_cost 
+ON focus_usage_cost_hourly(provider_name, usage_hour, total_usage_cost);
+
+-- Aggregation by account + hour
+CREATE INDEX idx_account_hour_cost
+ON focus_usage_cost_hourly(billing_account_id, usage_hour, total_usage_cost);
+
+-- Aggregation by service + hour
+DROP INDEX idx_service_hour_cost;
+CREATE INDEX idx_service_hour_cost
+ON focus_usage_cost_hourly(provider_name, service_name, usage_hour, total_usage_cost);
 
 
 DROP TABLE focus_usage_cost_daily;
@@ -158,7 +201,7 @@ SELECT
     resource_id,
     application,
     business_unit,
-    DATE(charge_start_time) AS usage_date,
+    strftime('%Y-%m-%d', charge_start_time) AS usage_date,
     SUM(billed_cost) AS billed_cost,
     SUM(CASE WHEN effective_cost < 0 THEN effective_cost ELSE 0 END) AS total_credits,
     SUM(CASE WHEN effective_cost >= 0 THEN effective_cost ELSE 0 END) AS total_usage_cost,
@@ -169,7 +212,8 @@ FROM focus_usage_cost
 GROUP BY
     provider_name, billing_account_id, sub_account_id,
     service_category, service_name, region_id, resource_id,
-    application, business_unit, usage_date, usage_unit;
+    application, business_unit, usage_date, usage_unit
+ORDER BY usage_date;
     
 DROP TABLE focus_usage_cost_weekly;
 CREATE TABLE focus_usage_cost_weekly AS
@@ -183,7 +227,7 @@ SELECT
     resource_id,
     application,
     business_unit,
-    strftime('%Y-%W', charge_start_time) AS usage_week,
+    DATE(charge_start_time, 'weekday 1', '-7 days') AS usage_week,
     SUM(billed_cost) AS billed_cost,
     SUM(CASE WHEN effective_cost < 0 THEN effective_cost ELSE 0 END) AS total_credits,
     SUM(CASE WHEN effective_cost >= 0 THEN effective_cost ELSE 0 END) AS total_usage_cost,
@@ -194,7 +238,8 @@ FROM focus_usage_cost
 GROUP BY
     provider_name, billing_account_id, sub_account_id,
     service_category, service_name, region_id, resource_id,
-    application, business_unit, usage_week, usage_unit;
+    application, business_unit, usage_week, usage_unit
+ORDER BY usage_week;
     
 DROP TABLE focus_usage_cost_monthly;
 CREATE TABLE focus_usage_cost_monthly AS
@@ -219,4 +264,6 @@ FROM focus_usage_cost
 GROUP BY
     provider_name, billing_account_id, sub_account_id,
     service_category, service_name, region_id, resource_id,
-    application, business_unit, usage_month, usage_unit;
+    application, business_unit, usage_month, usage_unit
+ORDER BY usage_month;
+    
