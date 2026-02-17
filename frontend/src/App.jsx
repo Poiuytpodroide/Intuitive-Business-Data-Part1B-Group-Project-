@@ -14,6 +14,7 @@ function App() {
         <Routes>
             <Route index element={<Table />} />
             <Route path="/ai-dashboard" element={<AIdashboard />} />
+            <Route path="/service-viewer" element={<ServiceViewer />} />
             <Route path="/policy-editor" element={<PolicyCreator />} />
             <Route path="/service-viewer" element={<ServiceViewer />} />
             <Route path="/db-test" element={<TempPage />} />
