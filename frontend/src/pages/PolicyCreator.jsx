@@ -363,7 +363,7 @@ function PolicyCreator() {
                                     onClick={(e) => handleAnchorClick(e, b.id, 'left', null)}
                                     data-nodeid={b.id}
                                     data-side="left"
-                                    data-port={null}
+                                    data-port=""
                                     className="vpl-anchor absolute left-[-8px] top-1/2 -translate-y-1/2 w-3 h-3 bg-white border border-gray-300 rounded-full"
                                     style={{ cursor: 'pointer' }}
                                 />
@@ -396,7 +396,7 @@ function PolicyCreator() {
                                         onClick={(e) => handleAnchorClick(e, b.id, 'right', null)}
                                         data-nodeid={b.id}
                                         data-side="right"
-                                        data-port={null}
+                                        data-port=""
                                         className={`vpl-anchor absolute right-[-8px] top-1/2 -translate-y-1/2 w-3 h-3 rounded-full ${connectingFrom && connectingFrom.id === b.id ? 'bg-emerald-500 border-emerald-700' : 'bg-white border border-gray-300'}`}
                                         style={{ cursor: 'pointer' }}
                                     />
